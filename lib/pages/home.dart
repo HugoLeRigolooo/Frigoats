@@ -4,6 +4,7 @@ import 'package:mon_application/pages/plat_detail_page.dart';
 import '../models/CategoryModel.dart';
 import '../models/PlatsModel.dart';
 import '../services/database_service.dart';
+import '../services/market_price_service.dart'; // Import du nouveau service
 import '../widgets/custom_drawer.dart';
 import '../widgets/add_plat_dialog.dart';
 import '../widgets/open_filter_dialog.dart';
@@ -17,7 +18,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
-  
+  final MarketPriceService _marketPriceService = MarketPriceService(); // Instance du service
+
   List<CategoryModel> categories = [];
   List<PlatsModel> plats = [];
   List<PlatsModel> filteredPlats = [];
@@ -26,86 +28,55 @@ class _HomePageState extends State<HomePage> {
   bool _isSelectionMode = false;
   List<int> _selectedIds = [];
 
-  // Stockage des filtres actuels
   Map<String, dynamic> _currentFilters = {
     'type': 'Tous',
-    'prix': 50.0,
-    'duree': 60.0,
+    'prix': 100.0,
+    'duree': 180.0,
   };
 
   @override
   void initState() {
     super.initState();
+    _initData();
+  }
+
+  // Initialisation groupée (Base de données + Prix du marché)
+  Future<void> _initData() async {
+    setState(() => _isLoading = true);
+    
+    // 1. Charger les catégories
     categories = CategoryModel.getCategories();
-    _refreshPlats();
+    
+    // 2. Charger les prix depuis GitHub
+    await _marketPriceService.init();
+    
+    // 3. Charger les plats
+    await _refreshPlats();
   }
 
   Future<void> _refreshPlats() async {
-    setState(() => _isLoading = true);
     final data = await DatabaseService.instance.readAllPlats();
     setState(() {
       plats = data;
-      _applyFilters(); // On applique les filtres sur les nouvelles données
+      _applyFilters();
       _isLoading = false;
     });
   }
 
-  // Logique combinée : Recherche + Filtres (Type, Prix, Durée)
   void _applyFilters() {
     setState(() {
       filteredPlats = plats.where((plat) {
-        // 1. Recherche par nom
         final matchesName = plat.name.toLowerCase().contains(_searchController.text.toLowerCase());
-
-        // 2. Filtre par type (CORRIGÉ)
-        // On compare tout en minuscules et sans espaces superflus
         final String filterType = _currentFilters['type'].toString().trim().toLowerCase();
         final String platType = plat.type.trim().toLowerCase();
-        
         final matchesType = filterType == 'tous' || platType == filterType;
-
-        // 3. Filtre par prix
         final matchesPrix = plat.prix <= _currentFilters['prix'];
-
-        // 4. Filtre par durée
         final intMinutes = int.tryParse(plat.duration.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
         final matchesDuree = intMinutes <= _currentFilters['duree'];
 
         return matchesName && matchesType && matchesPrix && matchesDuree;
       }).toList();
     });
-  }
-
-  Future<void> _ouvrirDialogueAjout() async {
-    final nouveauPlat = await showDialog<PlatsModel>(
-      context: context,
-      builder: (context) => const AddPlatDialog(),
-    );
-
-    if (nouveauPlat != null) {
-      await DatabaseService.instance.createPlat(nouveauPlat);
-      _refreshPlats();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Nouvelle recette enregistrée !")),
-      );
-    }
-  }
-
-  Future<void> _deleteSelectedPlats() async {
-    if (_selectedIds.isNotEmpty) {
-      await DatabaseService.instance.deleteMultiplePlats(_selectedIds);
-      setState(() {
-        _isSelectionMode = false;
-        _selectedIds.clear();
-      });
-      await _refreshPlats();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Recettes supprimées"),
-          backgroundColor: Colors.redAccent,
-        ),
-      );
-    }
   }
 
   @override
@@ -172,6 +143,12 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // Widget qui affiche le budget estimé
+  
+
+  // Les autres méthodes (_buildAppBar, _searchField, _hasActiveFilters, _buildGrid, etc.) 
+  // restent identiques à ton code initial...
+  
   AppBar _buildAppBar() {
     return AppBar(
       backgroundColor: Colors.white,
@@ -260,7 +237,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Vérifie si des filtres (hors "Tous") sont actifs pour changer la couleur de l'icône
   bool _hasActiveFilters() {
     return _currentFilters['type'] != 'Tous' || 
            _currentFilters['prix'] < 100.0 || 
@@ -360,7 +336,8 @@ class _HomePageState extends State<HomePage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text("${plat.prix} €", 
+                                // Ici on affiche le prix saisi OU le prix du marché si 0
+                                Text("${(plat.prix > 0 ? plat.prix : _marketPriceService.getPrice(plat.name)).toStringAsFixed(2)} €", 
                                     style: const TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 13)),
                                 Text(plat.duration, 
                                     style: const TextStyle(color: Colors.grey, fontSize: 11)),
@@ -387,5 +364,37 @@ class _HomePageState extends State<HomePage> {
         );
       },
     );
+  }
+
+  Future<void> _ouvrirDialogueAjout() async {
+    final nouveauPlat = await showDialog<PlatsModel>(
+      context: context,
+      builder: (context) => const AddPlatDialog(),
+    );
+
+    if (nouveauPlat != null) {
+      await DatabaseService.instance.createPlat(nouveauPlat);
+      _refreshPlats();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Nouvelle recette enregistrée !")),
+      );
+    }
+  }
+
+  Future<void> _deleteSelectedPlats() async {
+    if (_selectedIds.isNotEmpty) {
+      await DatabaseService.instance.deleteMultiplePlats(_selectedIds);
+      setState(() {
+        _isSelectionMode = false;
+        _selectedIds.clear();
+      });
+      await _refreshPlats();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Recettes supprimées"),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+    }
   }
 }

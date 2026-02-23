@@ -36,7 +36,7 @@ class PlatsModel {
       duration: map['duration'],
       type: map['type'],
       photo: map['photo'],
-      prix: map['prix'],
+      prix: (map['prix'] as num).toDouble(),
       ingredients: map['ingredients'] != null ? (map['ingredients'] as String).split(", ").map((e) => e.trim()).toList() : [],
     );
   }
