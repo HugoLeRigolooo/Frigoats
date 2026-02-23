@@ -78,7 +78,7 @@ class _ProduitsSaisonPageState extends State<ProduitsSaisonPage> {
           ),
         ],
       ),
-      endDrawer: CustomDrawer(onPlatAjoute: (p) {}),
+      endDrawer: const CustomDrawer(),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: Colors.orangeAccent))
           : Column(

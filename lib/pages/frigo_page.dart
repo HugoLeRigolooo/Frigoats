@@ -15,7 +15,6 @@ class _FrigoPageState extends State<FrigoPage> {
   List<Aliment> _mesAliments = [];
   bool _isLoading = true;
 
-  // Contrôleurs pour le dialogue d'ajout
   final TextEditingController _alimentController = TextEditingController();
   final TextEditingController _quantiteController = TextEditingController();
   DateTime? _selectedDate;
@@ -28,7 +27,6 @@ class _FrigoPageState extends State<FrigoPage> {
     _refreshAliments();
   }
 
-  // Charge les aliments depuis la BDD SQLite
   Future<void> _refreshAliments() async {
     setState(() => _isLoading = true);
     final data = await DatabaseService.instance.readAllAliments();
@@ -161,7 +159,7 @@ class _FrigoPageState extends State<FrigoPage> {
           )),
         ],
       ),
-      endDrawer: CustomDrawer(onPlatAjoute: (p) {}),
+      endDrawer: const CustomDrawer(),
       body: _isLoading 
         ? const Center(child: CircularProgressIndicator(color: Colors.orangeAccent))
         : _mesAliments.isEmpty 

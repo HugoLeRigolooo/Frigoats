@@ -89,7 +89,6 @@ class _AddPlatDialogState extends State<AddPlatDialog> {
     super.dispose();
   }
 
-  // --- STYLE : Décoration des champs ---
   InputDecoration _inputStyle(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
@@ -119,14 +118,12 @@ class _AddPlatDialogState extends State<AddPlatDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Header
               const Text(
                 "Nouvelle Recette",
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
               ),
               const SizedBox(height: 20),
 
-              // Section Photo
               GestureDetector(
                 onTap: _pickImageGallerie,
                 child: Container(
@@ -153,14 +150,12 @@ class _AddPlatDialogState extends State<AddPlatDialog> {
               ),
               const SizedBox(height: 20),
 
-              // Nom de la recette
               TextField(
                 controller: _platController,
                 decoration: _inputStyle("Nom du plat", Icons.restaurant_menu),
               ),
               const SizedBox(height: 15),
 
-              // Type de plat (Chips de sélection)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: ["entrée", "plat", "dessert"].map((t) {
@@ -176,7 +171,6 @@ class _AddPlatDialogState extends State<AddPlatDialog> {
               ),
               const SizedBox(height: 15),
 
-              // Compteurs (Durée & Prix)
               Row(
                 children: [
                   Expanded(child: _buildCounterCard("⏳ Durée", _duree, "min", (v) => setState(() => _duree = v))),
@@ -186,7 +180,6 @@ class _AddPlatDialogState extends State<AddPlatDialog> {
               ),
               const SizedBox(height: 20),
 
-              // Ingrédients avec Autocomplete
               Autocomplete<String>(
                 optionsBuilder: (TextEditingValue textEditingValue) {
                   if (textEditingValue.text.isEmpty) {
@@ -201,7 +194,6 @@ class _AddPlatDialogState extends State<AddPlatDialog> {
                       _selectedIngredients.add(selection);
                     }
                   });
-                  // On ne vide pas manuellement ici pour éviter le conflit de focus
                 },
                 fieldViewBuilder: (context, textEditingController, focusNode, onFieldSubmitted) {
                   return TextField(
@@ -215,8 +207,8 @@ class _AddPlatDialogState extends State<AddPlatDialog> {
                             _selectedIngredients.add(value.trim());
                           }
                         });
-                        textEditingController.clear(); // On vide le champ
-                        onFieldSubmitted(); // On notifie l'Autocomplete que c'est fini
+                        textEditingController.clear();
+                        onFieldSubmitted(); 
                       }
                     },
                   );
@@ -224,7 +216,6 @@ class _AddPlatDialogState extends State<AddPlatDialog> {
               ),
               const SizedBox(height: 10),
 
-              // Badges Ingrédients
               Wrap(
                 spacing: 8.0,
                 children: _selectedIngredients.map((ing) => Chip(
@@ -236,7 +227,6 @@ class _AddPlatDialogState extends State<AddPlatDialog> {
               ),
               const SizedBox(height: 30),
 
-              // Actions
               Row(
                 children: [
                   Expanded(

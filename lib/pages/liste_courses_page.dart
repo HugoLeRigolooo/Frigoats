@@ -41,7 +41,7 @@ class _ListeCoursesPageState extends State<ListeCoursesPage> {
         nom: _alimentController.text.trim(),
         quantite: int.tryParse(_quantiteController.text) ?? 1,
         unite: _selectedUnite,
-        datePeremption: null, // Pas de péremption nécessaire pour les courses
+        datePeremption: null,
       );
 
       await DatabaseService.instance.createAlimentListeCourses(nouvelAliment);
@@ -131,7 +131,7 @@ class _ListeCoursesPageState extends State<ListeCoursesPage> {
           )),
         ],
       ),
-      endDrawer: CustomDrawer(onPlatAjoute: (p) {}),
+      endDrawer: const CustomDrawer(),
       body: _isLoading 
         ? const Center(child: CircularProgressIndicator(color: Colors.orangeAccent))
         : _mesAliments.isEmpty 

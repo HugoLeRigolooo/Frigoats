@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import '../widgets/custom_drawer.dart';
+import '../services/database_service.dart';
 
 class MinuteurPage extends StatefulWidget {
   final int dureeInitiale;
@@ -78,11 +80,20 @@ class _MinuteurPageState extends State<MinuteurPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Minuteur', style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        backgroundColor: Colors.orangeAccent,
+        backgroundColor: Colors.white,
         elevation: 0,
+        centerTitle: true,
+        title: const Text('Mon Minuteur', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        actions: [
+          Builder(builder: (context) => IconButton(
+            icon: const Icon(Icons.menu_open_rounded, color: Colors.orangeAccent, size: 30),
+            onPressed: () => Scaffold.of(context).openEndDrawer(),
+          )),
+        ],
       ),
+
+      endDrawer: const CustomDrawer(),
+
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -93,7 +104,6 @@ class _MinuteurPageState extends State<MinuteurPage> {
             ),
             const SizedBox(height: 15),
             
-            // Compteur compact
             Center(
               child: SizedBox(
                 width: 150,
@@ -110,8 +120,6 @@ class _MinuteurPageState extends State<MinuteurPage> {
             ),
 
             const SizedBox(height: 50),
-
-            // Cercle de progression
             Stack(
               alignment: Alignment.center,
               children: [

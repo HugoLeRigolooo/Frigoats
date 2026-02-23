@@ -9,7 +9,6 @@ class OpenFilterDialog extends StatefulWidget {
 }
 
 class _OpenFilterDialogState extends State<OpenFilterDialog> {
-  // Définition des valeurs par défaut
   static const String _defaultType = 'Tous';
   static const double _defaultPrix = 50.0;
   static const double _defaultDuree = 60.0;
@@ -23,7 +22,6 @@ class _OpenFilterDialogState extends State<OpenFilterDialog> {
   @override
   void initState() {
     super.initState();
-    // On initialise avec les filtres actuels ou les valeurs par défaut
     _selectedType = widget.initialFilters?['type'] ?? _defaultType;
     _maxPrix = widget.initialFilters?['prix'] ?? _defaultPrix;
     _maxDuree = widget.initialFilters?['duree'] ?? _defaultDuree;
@@ -82,10 +80,8 @@ class _OpenFilterDialogState extends State<OpenFilterDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Bouton Réinitialiser au lieu de simplement Annuler
                 TextButton(
                   onPressed: () {
-                    // On renvoie les valeurs par défaut à la HomePage
                     Navigator.pop(context, {
                       'type': _defaultType,
                       'prix': _defaultPrix,

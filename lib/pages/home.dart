@@ -4,7 +4,7 @@ import 'package:mon_application/pages/plat_detail_page.dart';
 import '../models/CategoryModel.dart';
 import '../models/PlatsModel.dart';
 import '../services/database_service.dart';
-import '../services/market_price_service.dart'; // Import du nouveau service
+import '../services/market_price_service.dart';
 import '../widgets/custom_drawer.dart';
 import '../widgets/add_plat_dialog.dart';
 import '../widgets/open_filter_dialog.dart';
@@ -18,7 +18,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
-  final MarketPriceService _marketPriceService = MarketPriceService(); // Instance du service
+  final MarketPriceService _marketPriceService = MarketPriceService();
 
   List<CategoryModel> categories = [];
   List<PlatsModel> plats = [];
@@ -40,17 +40,11 @@ class _HomePageState extends State<HomePage> {
     _initData();
   }
 
-  // Initialisation groupée (Base de données + Prix du marché)
+// github
   Future<void> _initData() async {
     setState(() => _isLoading = true);
-    
-    // 1. Charger les catégories
     categories = CategoryModel.getCategories();
-    
-    // 2. Charger les prix depuis GitHub
     await _marketPriceService.init();
-    
-    // 3. Charger les plats
     await _refreshPlats();
   }
 
@@ -84,12 +78,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: const Color(0xFFFBFBFB),
       appBar: _buildAppBar(),
-      endDrawer: CustomDrawer(
-        onPlatAjoute: (nouveauPlat) async {
-          await DatabaseService.instance.createPlat(nouveauPlat);
-          _refreshPlats();
-        },
-      ),
+      endDrawer: const CustomDrawer(),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator(color: Colors.orangeAccent))
           : ListView(
@@ -143,12 +132,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Widget qui affiche le budget estimé
-  
-
-  // Les autres méthodes (_buildAppBar, _searchField, _hasActiveFilters, _buildGrid, etc.) 
-  // restent identiques à ton code initial...
-  
   AppBar _buildAppBar() {
     return AppBar(
       backgroundColor: Colors.white,
@@ -336,7 +319,7 @@ class _HomePageState extends State<HomePage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                // Ici on affiche le prix saisi OU le prix du marché si 0
+                                // affiche le prix saisi OU le prix du marché si 0
                                 Text("${(plat.prix > 0 ? plat.prix : _marketPriceService.getPrice(plat.name)).toStringAsFixed(2)} €", 
                                     style: const TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 13)),
                                 Text(plat.duration, 

@@ -21,14 +21,13 @@ class DatabaseService {
 
     return await openDatabase(
       path,
-      version: 3, // Version 3 pour inclure la table liste de courses
+      version: 3,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
     );
   }
 
   Future _createDB(Database db, int version) async {
-    // Table des PLATS
     await db.execute('''
       CREATE TABLE plats (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,7 +40,6 @@ class DatabaseService {
       )
     ''');
 
-    // Table des ALIMENTS (Frigo)
     await db.execute('''
       CREATE TABLE aliments (
         id TEXT PRIMARY KEY,
@@ -52,7 +50,6 @@ class DatabaseService {
       )
     ''');
 
-    // Table LISTE DE COURSES
     await db.execute('''
       CREATE TABLE alimentsListeCourses (
         id TEXT PRIMARY KEY,
@@ -89,7 +86,6 @@ class DatabaseService {
     }
   }
 
-  // --- MÉTHODES PLATS ---
   Future<void> createPlat(PlatsModel plat) async {
     final db = await instance.database;
     await db.insert('plats', plat.toMap());
@@ -115,7 +111,6 @@ class DatabaseService {
     await batch.commit(noResult: true);
   }
 
-  // --- MÉTHODES FRIGO ---
   Future<void> createAliment(Aliment aliment) async {
     final db = await instance.database;
     await db.insert('aliments', aliment.toMap());
@@ -132,7 +127,6 @@ class DatabaseService {
     await db.delete('aliments', where: 'id = ?', whereArgs: [id]);
   }
 
-  // --- MÉTHODES LISTE DE COURSES ---
   Future<void> createAlimentListeCourses(Aliment aliment) async {
     final db = await instance.database;
     await db.insert('alimentsListeCourses', aliment.toMap());

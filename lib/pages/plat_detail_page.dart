@@ -67,7 +67,6 @@ class PlatDetailPage extends StatelessWidget {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 15),
-                  // On transforme la String "tomate, poulet" en liste de Chips
                   
                   Wrap(
                     spacing: 10,
@@ -75,7 +74,7 @@ class PlatDetailPage extends StatelessWidget {
                     children: plat.ingredients.map((ing) {
                       return Chip(
                         backgroundColor: Colors.orange.shade50,
-                        label: Text(ing.trim()), // .trim() enlève les espaces inutiles
+                        label: Text(ing.trim()),
                         side: BorderSide.none,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       );
